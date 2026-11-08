@@ -1,0 +1,32 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://github.com/N0YU0/Echo-TH-Assignment/vex/nginx-1.25.5-bookworm-backports",
+  "author": "Echo Security Engineering <security@echo.local>",
+  "role": "Package Builder & Security Maintainer",
+  "timestamp": "2026-11-08T14:35:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "CVE-2024-7347"
+      },
+      "timestamp": "2026-11-08T14:35:00Z",
+      "products": [
+        { "@id": "pkg:deb/debian/nginx@1.25.5-1~bookworm" },
+        { "@id": "pkg:deb/debian/nginx@1.25.5-1~bookworm?arch=amd64&distro=debian-12" },
+        { "@id": "pkg:deb/debian/nginx@1.25.5-1~bookworm?arch=amd64&distro=debian-12.15" },
+        { "@id": "pkg:generic/nginx@1.25.5" },
+        {
+          "@id": "pkg:oci/nginx",
+          "subcomponents": [
+            { "@id": "pkg:deb/debian/nginx@1.25.5-1~bookworm" },
+            { "@id": "pkg:generic/nginx@1.25.5" }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "inline_mitigations_already_exist",
+      "impact_statement": "Backported upstream commit a0d386416c9d03c2a1f4a3f15b79f8b3c22e30c1 (https://nginx.org/download/patch.2024.mp4.txt, build/patches/CVE-2024-7347.patch) onto nginx 1.25.5, fixing the 32-bit integer overflow and unordered chunk buffer over-read in ngx_http_mp4_crop_stsc_data()."
+    }
+  ]
+}
