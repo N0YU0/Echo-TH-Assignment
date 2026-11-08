@@ -1,0 +1,63 @@
+name: Build, Patch, Scan & Test NGINX Image
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  BASELINE_IMAGE: nginx:1.25-bookworm
+  PATCHED_IMAGE: nginx:1.25-bookworm-patched
+  GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/nginx-bookworm-patched:1.25.5
+
+jobs:
+  build-scan-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build .deb from source and build container image
+        run: make image
+
+      - name: Run automated compatibility test suite
+        run: make test | tee scans/compat-test-results.txt
+
+      - name: Install Trivy and Grype
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Run Baseline, Patched, and OpenVEX Scans
+        run: python3 test/run_scans.py
+
+      - name: Log in and push patched image to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image to GHCR
+        if: github.event_name != 'pull_request'
+        run: |
+          IMAGE_LOWER="$(echo "${GHCR_IMAGE}" | tr '[:upper:]' '[:lower:]')"
+          docker tag "${PATCHED_IMAGE}" "${IMAGE_LOWER}"
+          docker push "${IMAGE_LOWER}"
+
+      - name: Upload build and scan artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: echo-nginx-build-and-scans
+          path: |
+            build/out/*.deb
+            baseline-trivy.txt
+            baseline-grype.txt
+            scans/*.txt
+            vex.openvex.json
