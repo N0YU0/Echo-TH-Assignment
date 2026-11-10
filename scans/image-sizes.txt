@@ -1,0 +1,8 @@
+=== Image Size Comparison ===
+REPOSITORY:TAG                IMAGE ID       SIZE
+nginx:1.25-bookworm           c1060b96b015   188MB
+nginx:1.25-bookworm-patched   848e1c3ab635   176MB
+
+Baseline bytes: 187659947 (178.97 MiB)
+Patched  bytes: 176120070 (167.96 MiB)
+Difference    : -11539877 bytes (-11.01 MiB / -6.15%)
