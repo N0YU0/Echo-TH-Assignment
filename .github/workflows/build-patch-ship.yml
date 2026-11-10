@@ -59,7 +59,5 @@ jobs:
           name: echo-nginx-build-and-scans
           path: |
             build/out/*.deb
-            baseline-trivy.txt
-            baseline-grype.txt
             scans/*.txt
             vex.openvex.json

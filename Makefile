@@ -22,7 +22,10 @@ help:
 deb:
 	mkdir -p $(DEB_OUT_DIR)
 	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile --target builder -t echo-nginx-deb-builder .
-	docker run --rm -v "$(CURDIR)/$(DEB_OUT_DIR):/host_out" echo-nginx-deb-builder cp -a /out/. /host_out/
+	docker rm -f echo-deb-extract 2>/dev/null || true
+	docker create --name echo-deb-extract echo-nginx-deb-builder
+	docker cp echo-deb-extract:/out/. $(DEB_OUT_DIR)/
+	docker rm -f echo-deb-extract
 
 image: deb
 	DOCKER_BUILDKIT=1 docker build -f Containerfile -t $(PATCHED_IMAGE) .

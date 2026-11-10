@@ -18,7 +18,16 @@ def find_bin(name: str) -> str:
 
 def scan(cmd: list[str], out: Path) -> None:
     print(f"==> {' '.join(cmd)}")
-    res = subprocess.run(cmd, cwd=REPO_ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace", check=True)
+    res = subprocess.run(
+        cmd,
+        cwd=REPO_ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=True,
+    )
     out.write_text(res.stdout, encoding="utf-8")
 
 
@@ -28,11 +37,9 @@ def main() -> None:
 
     if not (SCANS_DIR / "baseline-trivy.txt").exists():
         scan([trivy, "image", "--quiet", BASELINE_IMAGE], SCANS_DIR / "baseline-trivy.txt")
-    shutil.copyfile(SCANS_DIR / "baseline-trivy.txt", REPO_ROOT / "baseline-trivy.txt")
 
     if not (SCANS_DIR / "baseline-grype.txt").exists():
         scan([grype, "-q", BASELINE_IMAGE], SCANS_DIR / "baseline-grype.txt")
-    shutil.copyfile(SCANS_DIR / "baseline-grype.txt", REPO_ROOT / "baseline-grype.txt")
 
     scan([trivy, "image", "--quiet", PATCHED_IMAGE], SCANS_DIR / "patched-trivy.txt")
     scan([grype, "-q", PATCHED_IMAGE], SCANS_DIR / "patched-grype.txt")

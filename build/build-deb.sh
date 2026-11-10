@@ -23,6 +23,7 @@ for p in "${SCRIPT_DIR}"/patches/*.patch; do
     echo "    Applying $(basename "${p}")"
     patch -p1 < "${p}"
 done
+# Check if patch has been applied
 grep -q "unordered mp4 stsc chunks" src/http/modules/ngx_http_mp4_module.c
 
 echo "==> [3/4] Configuring and compiling nginx ${NGINX_VERSION}..."
